@@ -1,8 +1,10 @@
 # afficheur-hp-hc
 
-Petit outil CLI en Go + DuckDB qui indique la plage tarifaire actuelle (`HP` ou `HC`), sa periode, son heure de fin, le temps restant et la prochaine plage.
+CLI en Go + DuckDB qui indique la plage tarifaire actuelle (`HP` ou `HC`), sa periode, son heure de fin, le temps restant et la prochaine plage.
 
-## Utilisation
+## Utilisation 
+
+Avec une base DuckDB en mémoire :
 
 ```bash
 go run .
@@ -14,19 +16,19 @@ Avec une date de test :
 go run . -db :memory: -at "2026-06-17 14:30:00"
 ```
 
-Avec une base DuckDB precise :
+Avec une base DuckDB précise:
 
 ```bash
 go run . -db ./conso_elec.duckdb
 ```
 
-Forcer le rechargement du referentiel CSV :
+Forcer le rechargement du réferentiel CSV en base :
 
 ```bash
 go run . -db ./conso_elec.duckdb -reload-ref
 ```
 
-Desactiver les couleurs ANSI :
+Désactiver les couleurs ANSI :
 
 ```bash
 go run . -no-color
@@ -38,11 +40,14 @@ go run . -no-color
 go test ./...
 ```
 
-## Referentiel
+## Réferentiel
 
-Le referentiel source est `ressources/ref_time_slot.csv`. Il est importe dans DuckDB dans la table `reference.ref_time_slot` uniquement si cette table vient d'etre creee.
+Le réferentiel source est `ressources/ref_time_slot.csv`. 
+Les plages des tarification par défaut sont basées sur [l'offre flexibilité 2 saisons d'Enercoop] (https://www.enercoop.fr/notre-offre/flexibilite2saisons)
 
-Si la table existe deja, elle est conservee telle quelle. Pour remplacer son contenu par celui du CSV, utiliser `-reload-ref`, ce qui fait un `TRUNCATE TABLE reference.ref_time_slot` puis un nouvel import.
+Il est importé dans DuckDB dans la table `reference.ref_time_slot` uniquement si cette table vient d'etre créee.
+
+Si la table existe déjà, elle est conservée telle quelle. Pour remplacer son contenu par celui du CSV, utiliser `-reload-ref`, ce qui fait un `TRUNCATE TABLE reference.ref_time_slot` puis un nouvel import.
 
 Il utilise la convention DuckDB `strftime('%w')` :
 
@@ -54,4 +59,4 @@ Il utilise la convention DuckDB `strftime('%w')` :
 - vendredi = `5`
 - samedi = `6`
 
-Les heures de fin sont traitees en borne exclusive : une plage `00:00 -> 06:59` est calculee comme `[00:00 ; 07:00[`.
+Les heures de fin sont traitées en borne exclusive : une plage `00:00 -> 06:59` est calculée comme `[00:00 ; 07:00[`.
