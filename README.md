@@ -1,6 +1,6 @@
 # afficheur-hp-hc
 
-Petit outil Go + DuckDB qui indique la plage tarifaire actuelle (`HP` ou `HC`), sa periode, son heure de fin, le temps restant et la prochaine plage.
+Petit outil CLI en Go + DuckDB qui indique la plage tarifaire actuelle (`HP` ou `HC`), sa periode, son heure de fin, le temps restant et la prochaine plage.
 
 ## Utilisation
 
@@ -55,4 +55,3 @@ Il utilise la convention DuckDB `strftime('%w')` :
 - samedi = `6`
 
 Les heures de fin sont traitees en borne exclusive : une plage `00:00 -> 06:59` est calculee comme `[00:00 ; 07:00[`.
-
