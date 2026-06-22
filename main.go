@@ -5,19 +5,23 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	appdb "afficheur-hp-hc/internal/db"
 	"afficheur-hp-hc/internal/hphc"
+	"afficheur-hp-hc/internal/web"
 )
 
 func main() {
 	var dbPath string
 	var atValue string
+	var httpAddr string
 	var reloadReference bool
 	var noColor bool
 	flag.StringVar(&dbPath, "db", "conso_elec.duckdb", "chemin de la base DuckDB")
 	flag.StringVar(&atValue, "at", "", "horodatage de test au format 2006-01-02 15:04:05")
+	flag.StringVar(&httpAddr, "http", "", "adresse HTTP a ecouter, par exemple :8080")
 	flag.BoolVar(&reloadReference, "reload-ref", false, "recharge ressources/ref_time_slot.csv dans DuckDB")
 	flag.BoolVar(&noColor, "no-color", false, "desactive les couleurs ANSI")
 	flag.Parse()
@@ -37,6 +41,11 @@ func main() {
 		log.Fatal(err)
 	}
 	defer conn.Close()
+
+	if httpAddr != "" {
+		log.Printf("serveur web disponible sur http://localhost%s", httpAddr)
+		log.Fatal(http.ListenAndServe(httpAddr, web.NewServer(conn)))
+	}
 
 	status, err := hphc.CurrentSlot(ctx, conn, at)
 	if err != nil {

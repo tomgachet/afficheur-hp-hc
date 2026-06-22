@@ -13,6 +13,14 @@ import (
 
 var ErrNoSlot = errors.New("no HP/HC slot found")
 
+type Slot struct {
+	Type            string
+	Period          string
+	Start           time.Time
+	End             time.Time
+	DurationMinutes int
+}
+
 type SlotStatus struct {
 	Timestamp           time.Time
 	CurrentType         string
@@ -25,6 +33,43 @@ type SlotStatus struct {
 	NextStart           time.Time
 	NextEnd             time.Time
 	NextDurationMinutes int
+}
+
+func UpcomingSlots(ctx context.Context, db *sql.DB, at time.Time, limit int) ([]Slot, error) {
+	if limit <= 0 {
+		return nil, nil
+	}
+
+	upcomingSlotsSQL, err := readSQLFile("upcoming_slots.sql")
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := db.QueryContext(ctx, upcomingSlotsSQL, at.Format("2006-01-02 15:04:05"), limit)
+	if err != nil {
+		return nil, fmt.Errorf("query upcoming slots: %w", err)
+	}
+	defer rows.Close()
+
+	var slots []Slot
+	for rows.Next() {
+		var slot Slot
+		if err := rows.Scan(
+			&slot.Type,
+			&slot.Period,
+			&slot.Start,
+			&slot.End,
+			&slot.DurationMinutes,
+		); err != nil {
+			return nil, fmt.Errorf("scan upcoming slot: %w", err)
+		}
+		slots = append(slots, slot)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate upcoming slots: %w", err)
+	}
+
+	return slots, nil
 }
 
 func CurrentSlot(ctx context.Context, db *sql.DB, at time.Time) (SlotStatus, error) {

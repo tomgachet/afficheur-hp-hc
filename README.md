@@ -1,6 +1,6 @@
 # afficheur-hp-hc
 
-Petit outil CLI en Go + DuckDB qui indique la plage tarifaire actuelle (`HP` ou `HC`), sa periode, son heure de fin, le temps restant et la prochaine plage.
+Outil en CLI + page HTML locale, en Go + DuckDB, qui indique la plage tarifaire actuelle (`HP` ou `HC`), sa periode, son heure de fin, le temps restant et les prochaines plages.
 
 ## Utilisation
 
@@ -31,6 +31,16 @@ Desactiver les couleurs ANSI :
 ```bash
 go run . -no-color
 ```
+
+Lancer la petite page web locale :
+
+```bash
+go run . -http :8080
+```
+
+Puis ouvrir `http://localhost:8080`. La page web affiche la plage en direct avec le meme calcul que la CLI.
+
+Pour tester une date precise, utiliser la CLI avec `-at`.
 
 ## Tests
 
